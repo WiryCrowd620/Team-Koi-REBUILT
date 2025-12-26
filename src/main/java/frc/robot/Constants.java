@@ -1,5 +1,5 @@
 package frc.robot;
-
+import java.util.Map;
 import edu.wpi.first.math.util.Units;
 
 public final class Constants {
@@ -10,12 +10,19 @@ public final class Constants {
 
   public static class VisionConstants {
     public static final String kLimelightName = "";
+
+    public static final Map<Integer, Boolean> scoringTags = Map.of(
+      // unintellegent pre-season data
+     1,true,
+     5, true
+    );
+    public static final double kAmbiguityTolerance = 0.7;
   }
 
   public static class SwerveDriveConstants {
     public static final double kMaxSpeed = Units.feetToMeters(20);
-
     public static final double kVisionPeriod = 0.1; // 10Hz
+    
   }
 
   public static class ShooterConstants {
