@@ -1,7 +1,5 @@
 package frc.robot;
 
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
 
 public final class Constants {
@@ -10,18 +8,14 @@ public final class Constants {
     public static final int kOperatorControllerPort = 1;
   }
 
+  public static class VisionConstants {
+    public static final String kLimelightName = "";
+  }
+
   public static class SwerveDriveConstants {
     public static final double kMaxSpeed = Units.feetToMeters(20);
 
-    private static final Translation2d kFrontLeftPos = new Translation2d(0, 0);
-    private static final Translation2d kFrontRightPos = new Translation2d(0, 0);
-    private static final Translation2d kBackLeftPos   = new Translation2d(0, 0);
-    private static final Translation2d kBackRightPos  = new Translation2d(0, 0);
-
-    public static final SwerveDriveKinematics kSwerveDriveKinematics = new SwerveDriveKinematics(
-      kFrontLeftPos, kFrontRightPos,
-      kBackLeftPos, kBackRightPos
-    );
+    public static final double kVisionPeriod = 0.1; // 10Hz
   }
 
   public static class ShooterConstants {

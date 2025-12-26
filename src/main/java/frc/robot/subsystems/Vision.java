@@ -1,29 +1,36 @@
 package frc.robot.subsystems;
 
-import java.util.Arrays;
-
-import com.studica.frc.AHRS;
-import com.studica.frc.AHRS.NavXComType;
-
 import frc.robot.Constants;
-import frc.robot.StateRobot;
+import swervelib.SwerveDrive;
 import frc.robot.utils.LimelightHelpers;
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import frc.robot.utils.LimelightHelpers.PoseEstimate;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Vision extends SubsystemBase {
-    private AHRS m_gyro;
-    private SwerveDrivePoseEstimator m_poseEstimator;
+    private final String _limelightName;
 
     public Vision() {
-        m_gyro = new AHRS(NavXComType.kMXP_SPI);
+        _limelightName = Constants.VisionConstants.kLimelightName;
     }
 
-    public void updatePoseEstimation() {
-        
+    public void updatePoseEstimation(SwerveDrive swerveDrive) {
+        double robotYaw = swerveDrive.getYaw().getDegrees();
+        LimelightHelpers.SetRobotOrientation(_limelightName, robotYaw, 0.0, 0.0, 0.0, 0.0, 0.0);
+    
+        PoseEstimate est = null;
+        if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue) {
+            est = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(_limelightName);
+        } else {
+            est = LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2(_limelightName);
+        }
+
+        if (est == null) return;
+        if (est.tagCount < 1) return;
+        if (est.pose == null) return;
+
+        swerveDrive.addVisionMeasurement(est.pose,est.timestampSeconds);
     }
 
     @Override
