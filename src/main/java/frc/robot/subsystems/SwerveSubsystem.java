@@ -32,6 +32,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
@@ -50,7 +51,16 @@ import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 
 public class SwerveSubsystem extends SubsystemBase {
+public enum SwerveState {
+    IDLE,
+    TELEOP,
+    AUTO,
+    VISION_AIMING,
+    VISION_LOCKED,
+    AUTO_DRIVE
+}
 
+//#region intialization
     /**
      * Swerve drive object.
      */
@@ -66,6 +76,8 @@ public class SwerveSubsystem extends SubsystemBase {
     private Vision vision;
 
     private double lastVisionTime = 0.0;
+
+    private SwerveState state = SwerveState.IDLE;
 
     /**
      * Initialize {@link SwerveDrive} with the directory provided.
@@ -105,7 +117,7 @@ public class SwerveSubsystem extends SubsystemBase {
         // over the internal encoder and push the offsets onto it. Throws warning if not
         // possible
         if (visionDriveTest) {
-            setupPhotonVision();
+            setupVision();
             // Stop the odometry thread if we are using vision that way we can synchronize
             // updates better.
             swerveDrive.stopOdometryThread();
@@ -131,7 +143,7 @@ public class SwerveSubsystem extends SubsystemBase {
     /**
      * Setup the photon vision class.
      */
-    public void setupPhotonVision() {
+    public void setupVision() {
         vision = new Vision(swerveDrive::getPose);
         swerveDrive.drive(null, lastVisionTime, visionDriveTest, visionDriveTest);
     }
@@ -232,7 +244,9 @@ public class SwerveSubsystem extends SubsystemBase {
         // event markers.
         return new PathPlannerAuto(pathName);
     }
+//#endregion
 
+//#region drive commands
     /**
      * Use PathPlanner Path finding to go to a point on the field.
      *
@@ -427,6 +441,21 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     /**
+     * Drive the robot given a chassis field oriented velocity.
+     *
+     * @param velocity Velocity according to the field.
+     */
+    public Command driveFieldOriented(Supplier<ChassisSpeeds> velocity) {
+        state = SwerveState.TELEOP
+        return run(() -> {
+            swerveDrive.driveFieldOriented(velocity.get());
+        });
+    }
+
+    //#endregion
+
+//#region drive methods
+    /**
      * The primary method for controlling the drivebase. Takes a
      * {@link Translation2d} and a rotation rate, and
      * calculates and commands module states accordingly. Can use either open-loop
@@ -465,16 +494,7 @@ public class SwerveSubsystem extends SubsystemBase {
         swerveDrive.driveFieldOriented(velocity);
     }
 
-    /**
-     * Drive the robot given a chassis field oriented velocity.
-     *
-     * @param velocity Velocity according to the field.
-     */
-    public Command driveFieldOriented(Supplier<ChassisSpeeds> velocity) {
-        return run(() -> {
-            swerveDrive.driveFieldOriented(velocity.get());
-        });
-    }
+    
 
     /**
      * Drive according to the chassis robot oriented velocity.
@@ -485,6 +505,35 @@ public class SwerveSubsystem extends SubsystemBase {
         swerveDrive.drive(velocity);
     }
 
+//#endregion
+
+//#region Vision Aiming
+
+public Command AimAtScoringAprilla() {
+    var f = vision.getScoringTag();
+    if (!f.isPresent())
+    {
+        state = SwerveState.IDLE;
+        return runOnce(() -> {}); // return an empty command;
+    }
+    var fiducial = f.get();
+
+    /*
+     * for now we will just calculate the angle and move him
+     * later we might change to path planner autos
+     */
+
+    double angleRad = Math.toRadians(fiducial.txnc);
+
+    state = angleRad < Constants.SwerveDriveConstants.kTargetErrorTolerance ? SwerveState.VISION_LOCKED : SwerveState.VISION_AIMING;
+
+    double angleRadPerSec = angleRad * Constants.SwerveDriveConstants.kRotationP;
+    return runOnce(() -> drive(new Translation2d(0, 0), angleRadPerSec, false));
+}
+
+//#endregion
+
+//#region util
     /**
      * Get the swerve drive kinematics object.
      *
@@ -700,4 +749,9 @@ public class SwerveSubsystem extends SubsystemBase {
     public SwerveDrive getSwerveDrive() {
         return swerveDrive;
     }
+
+    public SwerveState getState() {
+        return this.state;
+    }
+//#endregion
 }
