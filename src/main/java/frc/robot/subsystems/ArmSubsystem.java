@@ -39,9 +39,9 @@ public class ArmSubsystem extends SubsystemBase {
 
   /** Creates a new ArmSubsystem. */
   public ArmSubsystem() {
-    m_motor = new SparkMax(Constants.ArmConstants.MOTOR_ID, MotorType.kBrushless);
+    m_motor = new SparkMax(Constants.ArmConstants.kMotorID, MotorType.kBrushless);
     encoder = m_motor.getEncoder();
-    ab_encoder = new DutyCycleEncoder(Constants.ArmConstants.AB_ENCDR_ID, 360, Constants.ArmConstants.kEncoderOffset);
+    ab_encoder = new DutyCycleEncoder(Constants.ArmConstants.kAbsoluteEncoderID, 360, Constants.ArmConstants.kEncoderOffset);
     
     SparkMaxConfig config = new SparkMaxConfig();
     

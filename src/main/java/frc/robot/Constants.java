@@ -1,14 +1,32 @@
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.util.Units;
+
 public final class Constants {
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
     public static final int kOperatorControllerPort = 1;
   }
 
+  public static class SwerveDriveConstants {
+    public static final double kMaxSpeed = Units.feetToMeters(20);
+
+    private static final Translation2d kFrontLeftPos = new Translation2d(0, 0);
+    private static final Translation2d kFrontRightPos = new Translation2d(0, 0);
+    private static final Translation2d kBackLeftPos   = new Translation2d(0, 0);
+    private static final Translation2d kBackRightPos  = new Translation2d(0, 0);
+
+    public static final SwerveDriveKinematics kSwerveDriveKinematics = new SwerveDriveKinematics(
+      kFrontLeftPos, kFrontRightPos,
+      kBackLeftPos, kBackRightPos
+    );
+  }
+
   public static class ShooterConstants {
-    public static final int M_MOTOR_ID = 0;
-    public static final int S_MOTOR_ID = 0;
+    public static final int kMainMotorID = 0;
+    public static final int kSecondaryMotorID = 0;
     public static final boolean kSecondaryInverted = true;
     
     public static final double kGearRatio = 1.0;
@@ -25,8 +43,8 @@ public final class Constants {
 }
 
   public static class ArmConstants {
-    public static final int MOTOR_ID = 0;
-    public static final int AB_ENCDR_ID = 0;
+    public static final int kMotorID = 0;
+    public static final int kAbsoluteEncoderID = 0;
     public static final double kGearRatio = 100.0;
     public static final double kEncoderOffset = 0.0;
     public static final double kMinAngle = -5.0;

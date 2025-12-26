@@ -36,8 +36,8 @@ public class ShooterSubsystem extends SubsystemBase {
   private double targetRPM = Double.NaN;
 
   public ShooterSubsystem() {
-    m_motor = new SparkMax(Constants.ShooterConstants.M_MOTOR_ID, MotorType.kBrushless);
-    s_motor = new SparkMax(Constants.ShooterConstants.S_MOTOR_ID, MotorType.kBrushless);
+    m_motor = new SparkMax(Constants.ShooterConstants.kMainMotorID, MotorType.kBrushless);
+    s_motor = new SparkMax(Constants.ShooterConstants.kSecondaryMotorID, MotorType.kBrushless);
     encoder = m_motor.getEncoder();
     
     feedforward = new SimpleMotorFeedforward(
