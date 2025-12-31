@@ -525,7 +525,7 @@ public Command AimAtScoringAprilla() {
 
     double angleRad = Math.toRadians(fiducial.txnc);
 
-    state = angleRad < Constants.SwerveDriveConstants.kTargetErrorTolerance ? SwerveState.VISION_LOCKED : SwerveState.VISION_AIMING;
+    state = Math.abs(angleRad) < Constants.SwerveDriveConstants.kTargetErrorTolerance ? SwerveState.VISION_LOCKED : SwerveState.VISION_AIMING;
 
     double angleRadPerSec = angleRad * Constants.SwerveDriveConstants.kRotationP;
     return runOnce(() -> drive(new Translation2d(0, 0), angleRadPerSec, false));
