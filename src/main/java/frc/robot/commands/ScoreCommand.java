@@ -3,45 +3,38 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.subsystems.ShooterSubsystem;
-import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.Vision;
 
 import frc.robot.subsystems.ShooterSubsystem.ShooterState;
-import frc.robot.subsystems.SwerveSubsystem.SwerveState;
 
 public class ScoreCommand extends Command {
     public record ShooterPoint(
         double distanceMeters,
-        double angleDeg,
         double rpm
     ) {}
 
     private final ShooterSubsystem shooterSubsystem;
     private final Vision vision;
-    private final SwerveSubsystem drivebase;
 
-
-    public ScoreCommand(ShooterSubsystem shooterSubsystem, Vision vision, SwerveSubsystem drivebase) {
+    public ScoreCommand(ShooterSubsystem shooterSubsystem) {
         this.shooterSubsystem = shooterSubsystem;
-        this.vision = vision;
-        this.drivebase = drivebase;
+        this.vision = Vision.getInstance();
     }
 
-    // TODO: add hood code in
     @Override
     public void execute() {
-        /*(drivebase.AimAtScoringAprilla();
-        if (drivebase.getState() != SwerveState.VISION_LOCKED) return;
-        var f = vision.getScoringTag();
-        if (!f.isPresent()) return;
-        double distance = f.get().txnc;
-
-        ShooterPoint target = interpolate(distance);
-
-        shooterSubsystem.setTargetRPM(target.rpm);
-        if (shooterSubsystem.getState() != ShooterState.AT_TARGET) return;*/
-
-        // release the ball or smth I guess
+        double vHubDist = vision.getPosition().getTranslation().minus(Constants.FieldConstants.getHubPose().getTranslation()).getNorm();
+        if (vHubDist > Constants.ShooterConstants.kMaxShootingDist) {
+            System.out.println("Robot is too far from the hub");
+            return;
+        }
+        if (!vision.isHubLocked()) {
+            System.out.println("Robot is not angled correctly");
+        }
+        ShooterPoint sp = interpolate(vHubDist);
+        shooterSubsystem.setTargetRPM(sp.rpm);
+        if (shooterSubsystem.getState() != ShooterState.AT_TARGET) return;
+        // we will be releasing the ball into the shooter here I guess, and prolly do some other stuff.
     }
 
     public static ShooterPoint interpolate(double distance) {
@@ -58,7 +51,6 @@ public class ScoreCommand extends Command {
 
             return new ShooterPoint(
                 distance,
-                lerp(p1.angleDeg(), p2.angleDeg(), t),
                 lerp(p1.rpm(),      p2.rpm(),      t)
             );
         }

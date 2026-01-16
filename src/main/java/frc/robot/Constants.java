@@ -1,5 +1,4 @@
 package frc.robot;
-import java.util.Map;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -28,6 +27,7 @@ public final class Constants {
 
   public static class VisionConstants {
     public static final String kLimelightName = "";
+    public static final double kAimTolerance = 0.2;
   }
 
   public static class SwerveDriveConstants {
@@ -41,7 +41,7 @@ public final class Constants {
     public static final int kMainMotorID = 0;
     
     public static final double kGearRatio = 1.0;
-    public static final double kTolerance = 50.0;
+    public static final double kTolerance = 20.0;
     
     public static final double kP = 0.0001;
     public static final double kI = 0.0;
@@ -53,11 +53,13 @@ public final class Constants {
 
     // fake data for now
     public static final ShooterPoint[] kShooterLUT = {
-      new ShooterPoint(2.0, 38, 3100),
-      new ShooterPoint(2.5, 40, 3350),
-      new ShooterPoint(3.0, 42, 3600),
-      new ShooterPoint(3.5, 44, 3900),
-      new ShooterPoint(4.0, 46, 4250),
+      new ShooterPoint(2.0, 3100),
+      new ShooterPoint(2.5, 3350),
+      new ShooterPoint(3.0, 3600),
+      new ShooterPoint(3.5, 3900),
+      new ShooterPoint(4.0, 4250)
   };
+
+  public static final double kMaxShootingDist = 4.0;
 }
 }

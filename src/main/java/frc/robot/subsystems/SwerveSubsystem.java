@@ -529,6 +529,11 @@ public class SwerveSubsystem extends SubsystemBase {
      * - `velocity` - controller input
     */
     public void driveWhileAiming(Supplier<ChassisSpeeds> velocity) {
+        Translation2d vHubDist = vision.getPosition().getTranslation().minus(Constants.FieldConstants.getHubPose().getTranslation());
+        if (vHubDist.getNorm() > Constants.ShooterConstants.kMaxShootingDist) {
+            System.out.println("Robot is too far from the hub");
+            return;
+        }
         state = SwerveState.VISION_AIMING;
         Pose2d hub = Constants.FieldConstants.getHubPose();
         Pose2d robotPose = getPose();

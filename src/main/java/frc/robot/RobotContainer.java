@@ -4,7 +4,6 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.ScoreCommand;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
-import frc.robot.subsystems.Vision;
 import swervelib.SwerveInputStream;
 
 import java.io.File;
@@ -12,7 +11,6 @@ import java.io.File;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj.RobotBase;
 
 public class RobotContainer {
   private final CommandXboxController m_driverController =
@@ -55,7 +53,7 @@ public class RobotContainer {
 
   private void configureBindings() {
     Command driveFieldOrientedAnglularVelocity = drivebase.driveFieldOriented(driveAngularVelocity);
-    Command scoreCommand = new ScoreCommand(shooterSubsystem, drivebase.getVision(), drivebase);
+    Command scoreCommand = new ScoreCommand(shooterSubsystem);
     
     drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
     m_driverController.rightBumper().whileTrue(drivebase.driveRelativeToHub(driveAngularVelocity));

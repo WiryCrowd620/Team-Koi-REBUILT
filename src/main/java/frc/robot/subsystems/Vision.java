@@ -48,4 +48,11 @@ public class Vision {
     }
 
     public Pose2d getPosition() {return currentPosition;}
+
+    public boolean isHubLocked() {
+        double angleToHub = Constants.FieldConstants.getHubPose().getTranslation()
+                .minus(currentPosition.getTranslation())
+                .getAngle().getDegrees();
+        return angleToHub <= Constants.VisionConstants.kAimTolerance;
+    }
 }
