@@ -6,12 +6,21 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.commands.ScoreCommand.ShooterPoint;
+import frc.robot.utils.RumbleSubsystem.Priority;
+import frc.robot.utils.RumblePack;
 
 public final class Constants {
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
     public static final int kOperatorControllerPort = 1;
     public static final double kDeadband = 0.3;
+
+    // Rumble constants
+    public static final RumblePack kGameShiftRumble = new RumblePack(0.7, 0.5, Priority.HIGH);
+
+    // Game data management
+    public static final int kTeleopInterval = 25;
+    public static final int kEndGameTime = 30;
   }
 
   public static class FieldConstants {

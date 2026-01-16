@@ -4,6 +4,8 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.ScoreCommand;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.utils.GameDataSubsystem;
+import frc.robot.utils.RumbleSubsystem;
 import swervelib.SwerveInputStream;
 
 import java.io.File;
@@ -17,6 +19,8 @@ public class RobotContainer {
       new CommandXboxController(OperatorConstants.kDriverControllerPort);
   private final CommandXboxController m_operatorController =
       new CommandXboxController(OperatorConstants.kOperatorControllerPort);
+  private final RumbleSubsystem rumbleSubsystem = new RumbleSubsystem(m_driverController, m_operatorController);
+  private final GameDataSubsystem gameDataSubsystem = new GameDataSubsystem(rumbleSubsystem);
 
   private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
 
