@@ -1,5 +1,7 @@
 package frc.robot;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
@@ -24,6 +26,8 @@ public final class Constants {
   }
 
   public static class FieldConstants {
+    public static final AprilTagFieldLayout kFieldApril = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
+    
     private static final Pose2d kBlueHub = new Pose2d(0, 0, new Rotation2d());
     private static final Pose2d kRedHub = new Pose2d(0, 0, new Rotation2d());
     public static Pose2d getHubPose() { 
