@@ -106,6 +106,31 @@ public final class Constants {
         new ShooterPoint(4.0, 4250)
     };
 
-    public static final double kMaxShootingDist = 4.0;
-  }
+  public static final double kMaxShootingDist = 4.0;
+}
+
+public static class IntakeArmConstants{
+  public static final int kAbsoluteEncoderID = 0;
+  public static final int kMotorID = 0;
+
+  public static final double kP = 0;
+  public static final double kI = 0;
+  public static final double kD = 0;
+  public static final double kFF = 0;
+    
+  public static final double kS = 0;
+  public static final double kV = 0;
+  public static final double kA = 0;
+  public static final double kG = 0;
+  public static final double kCosRatio = 1;
+
+  public static final int ABS_ENCODER_CHANNEL = 0;
+  public static final int ABS_ENCODER_RANGE = 360;
+  public static final int ABS_ENCODER_OFFSET = 0;
+
+  public static final double kTolerance = 0.5;
+
+  public static final int OPEN_ANGLE = 67;
+  public static final int CLOSED_ANGLE = 0;
+}
 }
