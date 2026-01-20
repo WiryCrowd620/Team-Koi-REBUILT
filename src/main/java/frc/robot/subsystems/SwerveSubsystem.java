@@ -462,7 +462,7 @@ public class SwerveSubsystem extends SubsystemBase {
     public Command driveRelativeToHub(Supplier<ChassisSpeeds> velocity) {
         state = SwerveState.VISION_AIMING;
         return run(() -> {
-            driveWhileAiming(velocity);
+            driveWhileAiming(velocity.get());
         }).finallyDo(() -> state = SwerveState.IDLE);
     }
 
@@ -528,7 +528,7 @@ public class SwerveSubsystem extends SubsystemBase {
      *
      * - `velocity` - controller input
     */
-    public void driveWhileAiming(Supplier<ChassisSpeeds> velocity) {
+    public void driveWhileAiming(ChassisSpeeds velocity) {
         Translation2d vHubDist = vision.getPosition().getTranslation().minus(Constants.FieldConstants.getHubPose().getTranslation());
         if (vHubDist.getNorm() > Constants.ShooterConstants.kMaxShootingDist) {
             System.out.println("Robot is too far from the hub");
@@ -543,9 +543,10 @@ public class SwerveSubsystem extends SubsystemBase {
                 .getAngle();
 
         double angularVelo = RotationPID.calculate(angleToHub.getRadians(), getHeading().getRadians());
-        ChassisSpeeds SwerveSpeed = velocity.get();
-        SwerveSpeed.omegaRadiansPerSecond = angularVelo;
-        swerveDrive.driveFieldOriented(SwerveSpeed);
+        velocity.omegaRadiansPerSecond = angularVelo;
+        velocity.vxMetersPerSecond *= Constants.SwerveDriveConstants.kAimingSpeedModifier;
+        velocity.vyMetersPerSecond *= Constants.SwerveDriveConstants.kAimingSpeedModifier;
+        swerveDrive.driveFieldOriented(velocity);
     }
 
     // #endregion

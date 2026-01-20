@@ -17,7 +17,7 @@ public class ExampleSubsystem extends SubsystemBase {
         // Inline construction of command goes here.
         // Subsystem::runOnce implicitly requires `this` subsystem.
         return runOnce(() -> {
-            /* one-time action goes here */
+            
         });
     }
 
