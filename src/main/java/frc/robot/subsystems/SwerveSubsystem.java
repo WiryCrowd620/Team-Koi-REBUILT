@@ -542,7 +542,7 @@ public class SwerveSubsystem extends SubsystemBase {
                 .minus(robotPose.getTranslation())
                 .getAngle();
 
-        double angularVelo = RotationPID.calculate(angleToHub.getRadians(), getHeading().getRadians());
+        double angularVelo = RotationPID.calculate(angleToTarget.getRadians(), getHeading().getRadians());
         velocity.omegaRadiansPerSecond = angularVelo;
         velocity.vxMetersPerSecond *= Constants.SwerveDriveConstants.kAimingSpeedModifier;
         velocity.vyMetersPerSecond *= Constants.SwerveDriveConstants.kAimingSpeedModifier;
