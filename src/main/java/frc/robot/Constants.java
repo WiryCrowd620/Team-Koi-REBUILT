@@ -49,8 +49,8 @@ public final class Constants {
   }
 
   public static class ShooterConstants {
-    public static final int kMainMotorID = 0;
-    public static final int kSecondaryMotorID = 0;
+    public static final int kMainMotorID = 15;
+    public static final int kSecondaryMotorID = 16;
 
     public static final double kGearRatio = 1.0;
     public static final double kTolerance = 20.0;
@@ -79,7 +79,7 @@ public final class Constants {
 
   public static class IntakeArmConstants {
     public static final int kAbsoluteEncoderID = 0;
-    public static final int kMotorID = 0;
+    public static final int kMotorID = 17;
 
     public static final double kP = 0;
     public static final double kI = 0;
@@ -102,10 +102,10 @@ public final class Constants {
   }
 
   public static class IntakeRollerConstants {
-    public static final int kMotorID = 0;
+    public static final int kMotorID = 18;
   }
 
   public static class FeederConstants {
-    public static final int kMotorID = 0;
+    public static final int kMotorID = 19;
   }
 }
