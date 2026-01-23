@@ -106,4 +106,8 @@ public static class IntakeArmConstants{
   public static final int kOpenAngle = 67;
   public static final int kClosedAngle = 0;
 }
+
+public static class feederConstants {
+  public static final int kMotorID = 0;
+}
 }
