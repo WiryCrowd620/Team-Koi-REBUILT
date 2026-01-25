@@ -34,6 +34,7 @@ public final class Constants {
     public static final double kMaxSpeed = 5.36448;
     public static final double kMaxAngularVelocity = Math.PI;
     public static final double kAimingSpeedModifier = 0.5;
+    public static final double kMaxStrafe = 0.5; // max strafe speed while aiming
     public static final double kVisionPeriod = 0.1; // 10Hz
     public static final double kTargetErrorTolerance = Math.toRadians(3);
     public static final double kPr = 0.0, kIr = 0.0, kDr = 0.0;
@@ -76,6 +77,7 @@ public final class Constants {
     }
 
     public static final double kMaxShootingDist = 4.0;
+    public static final double kRadialRPMComp = 150; // what rpm we need to compensate when driving backwards from the hub @ max accel
 
     public static final RumblePack kRumbleScoreReady = new RumblePack(0.3, 0.2, Priority.MEDIUM);
   }

@@ -25,7 +25,8 @@ public class ScoreCommand extends Command {
     private final Vision vision;
     private boolean firstTimeReady = true;
 
-    public ScoreCommand(ShooterSubsystem shooterSubsystem, HoodSubsystem hoodSubsystem, FeederSubsystem feederSubsystem) {
+    public ScoreCommand(ShooterSubsystem shooterSubsystem, HoodSubsystem hoodSubsystem,
+            FeederSubsystem feederSubsystem) {
         this.shooterSubsystem = shooterSubsystem;
         this.hoodSubsystem = hoodSubsystem;
         this.feederSubsystem = feederSubsystem;
@@ -36,8 +37,9 @@ public class ScoreCommand extends Command {
     @Override
     public void execute() {
         double vHubDist = vision.getPosition().getTranslation()
-        .minus(new Translation2d(FieldConstants.Hub.innerCenterPoint.getX(), FieldConstants.Hub.innerCenterPoint.getY()))
-        .getNorm();
+                .minus(new Translation2d(FieldConstants.Hub.innerCenterPoint.getX(),
+                        FieldConstants.Hub.innerCenterPoint.getY()))
+                .getNorm();
         if (vHubDist > Constants.ShooterConstants.kMaxShootingDist) {
             System.out.println("Robot is too far from the hub");
             return;
@@ -46,7 +48,9 @@ public class ScoreCommand extends Command {
             System.out.println("Robot is not angled correctly");
         }
         ShooterPoint sp = interpolate(vHubDist);
-        shooterSubsystem.setTargetRPM(sp.rpm);
+        // for shooting while moving we will only be adjusting rpm
+        shooterSubsystem.setTargetRPM(sp.rpm + Constants.ShooterConstants.kRadialRPMComp
+                * Superstructure.getInstance().getSwerveHubRelativeRadialSpeed());
         hoodSubsystem.setAngle(sp.hoodAngle);
         if (shooterSubsystem.getState() != ShooterState.AT_TARGET)
             return;
