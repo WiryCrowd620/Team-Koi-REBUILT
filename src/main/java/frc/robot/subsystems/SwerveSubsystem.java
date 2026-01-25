@@ -550,6 +550,40 @@ public class SwerveSubsystem extends SubsystemBase {
         swerveDrive.driveFieldOriented(velocity);
     }
 
+    public record HubRelativeVelocity(
+        double radialSpeed,
+        double strafeSpeed
+    ) {}
+
+public HubRelativeVelocity getHubRelativeVelocity() {
+    Translation2d robotToHubRaw =
+        FieldConstants.Hub.innerCenterPoint
+            .toTranslation2d()
+            .minus(swerveDrive.getPose().getTranslation());
+
+    double distance = robotToHubRaw.getNorm();
+    if (distance < 1e-6)
+        return new HubRelativeVelocity(0.0, 0.0);
+
+    Translation2d robotToHub = robotToHubRaw.div(distance);
+
+    ChassisSpeeds speeds = swerveDrive.getFieldVelocity();
+    Translation2d robotVel =
+        new Translation2d(speeds.vxMetersPerSecond,
+                          speeds.vyMetersPerSecond);
+
+    // Toward (+) / away (-) from hub
+    double radialSpeed = robotVel.dot(robotToHub);
+
+    // Sideways relative to hub
+    Translation2d tangentialVel =
+        robotVel.minus(robotToHub.times(radialSpeed));
+    double strafeSpeed = tangentialVel.getNorm();
+
+    return new HubRelativeVelocity(radialSpeed, strafeSpeed);
+}
+
+
     // #endregion
 
     // #region util

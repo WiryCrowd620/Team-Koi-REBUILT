@@ -23,23 +23,22 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 public class RobotContainer {
-  private final CommandXboxController m_driverController =
-      new CommandXboxController(OperatorConstants.kDriverControllerPort);
-  private final CommandXboxController m_operatorController =
-      new CommandXboxController(OperatorConstants.kOperatorControllerPort);
-  private final RumbleSubsystem rumbleSubsystem = new RumbleSubsystem(m_driverController, m_operatorController);
-  @SuppressWarnings("unused") // it's a periodic only subsystem
-  private final GameDataSubsystem gameDataSubsystem = new GameDataSubsystem(rumbleSubsystem);
+  private final CommandXboxController m_driverController = new CommandXboxController(
+            OperatorConstants.kDriverControllerPort);
+    private final CommandXboxController m_operatorController = new CommandXboxController(
+            OperatorConstants.kOperatorControllerPort);
 
-  private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
-  private final FeederSubsystem feederSubsystem = new FeederSubsystem();
-  private final IntakeArmSubsystem intakeArmSubsystem = new IntakeArmSubsystem();
-  private final IntakeRollerSubsytem intakeRollerSubsytem = new IntakeRollerSubsytem();
-  private final ClimberSubsystem climberSubsystem = new ClimberSubsystem();
-  private final HoodSubsystem hoodSubsystem = new HoodSubsystem();
+    Superstructure superstructure = Superstructure.getInstance();
 
-  private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
-      RobotBase.isSimulation() ? "swerve-sim" : "swerve"));
+    private final RumbleSubsystem rumbleSubsystem = superstructure.getRumbleSubsystem();
+    private final ShooterSubsystem shooterSubsystem = superstructure.getShooterSubsystem();
+    private final FeederSubsystem feederSubsystem = superstructure.getFeederSubsystem();
+    private final IntakeArmSubsystem intakeArmSubsystem = superstructure.getIntakeArmSubsystem();
+    private final IntakeRollerSubsytem intakeRollerSubsytem = superstructure.getIntakeRollerSubsytem();
+    private final ClimberSubsystem climberSubsystem = superstructure.getClimberSubsystem();
+    private final HoodSubsystem hoodSubsystem = superstructure.getHoodSubsystem();
+    private final SwerveSubsystem drivebase = superstructure.getDrivebase();
+
 
   
     /**
@@ -70,9 +69,11 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
+    rumbleSubsystem.setControllers(m_driverController, m_operatorController);
+
     Command driveFieldOrientedAnglularVelocity = drivebase.driveFieldOriented(driveAngularVelocity);
-    Command scoreCommand = new ScoreCommand(shooterSubsystem, hoodSubsystem, feederSubsystem, rumbleSubsystem);
-    Command IntakeCommand = new IntakeCommand(intakeArmSubsystem, intakeRollerSubsytem, rumbleSubsystem);
+    Command scoreCommand = new ScoreCommand(shooterSubsystem, hoodSubsystem, feederSubsystem);
+    Command IntakeCommand = new IntakeCommand(intakeArmSubsystem, intakeRollerSubsytem);
     
     drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
     m_driverController.rightBumper().whileTrue(drivebase.driveRelativeToHub(driveAngularVelocity));

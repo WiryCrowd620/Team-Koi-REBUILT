@@ -4,13 +4,13 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.FieldConstants;
+import frc.robot.Superstructure;
 import frc.robot.subsystems.FeederSubsystem;
 import frc.robot.subsystems.HoodSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.Vision;
 
 import frc.robot.subsystems.ShooterSubsystem.ShooterState;
-import frc.robot.utils.RumbleSubsystem;
 
 public class ScoreCommand extends Command {
     public record ShooterPoint(
@@ -23,16 +23,12 @@ public class ScoreCommand extends Command {
     private final HoodSubsystem hoodSubsystem;
     private final FeederSubsystem feederSubsystem;
     private final Vision vision;
-    private final RumbleSubsystem rumble;
-
     private boolean firstTimeReady = true;
 
-    public ScoreCommand(ShooterSubsystem shooterSubsystem, HoodSubsystem hoodSubsystem, FeederSubsystem feederSubsystem,
-            RumbleSubsystem rumble) {
+    public ScoreCommand(ShooterSubsystem shooterSubsystem, HoodSubsystem hoodSubsystem, FeederSubsystem feederSubsystem) {
         this.shooterSubsystem = shooterSubsystem;
         this.hoodSubsystem = hoodSubsystem;
         this.feederSubsystem = feederSubsystem;
-        this.rumble = rumble;
         this.vision = Vision.getInstance();
         addRequirements(shooterSubsystem, hoodSubsystem, feederSubsystem);
     }
@@ -55,7 +51,7 @@ public class ScoreCommand extends Command {
         if (shooterSubsystem.getState() != ShooterState.AT_TARGET)
             return;
         if (firstTimeReady) {
-            rumble.rumble(Constants.ShooterConstants.kRumbleScoreReady);
+            Superstructure.getInstance().getRumbleSubsystem().rumble(Constants.ShooterConstants.kRumbleScoreReady);
             firstTimeReady = false;
         }
         feederSubsystem.setVoltage(Constants.FeederConstants.kGrabPower);

@@ -2,23 +2,21 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
+import frc.robot.Superstructure;
 import frc.robot.subsystems.IntakeArmSubsystem;
 import frc.robot.subsystems.IntakeRollerSubsytem;
 import frc.robot.subsystems.IntakeArmSubsystem.IntakeArmState;
-import frc.robot.utils.RumbleSubsystem;
 
 public class IntakeCommand extends Command {
 
     private final IntakeArmSubsystem arm;
     private final IntakeRollerSubsytem rollers;
-    private final RumbleSubsystem rumble;
 
     private boolean firstTimeReady = true;
 
-    public IntakeCommand(IntakeArmSubsystem arm, IntakeRollerSubsytem rollers, RumbleSubsystem rumble) {
+    public IntakeCommand(IntakeArmSubsystem arm, IntakeRollerSubsytem rollers) {
         this.arm = arm;
         this.rollers = rollers;
-        this.rumble = rumble;
         addRequirements(arm, rollers);
     }
 
@@ -28,7 +26,7 @@ public class IntakeCommand extends Command {
         if (arm.getState() != IntakeArmState.OPEN)
             return;
         if (firstTimeReady) {
-            rumble.rumble(Constants.IntakeRollerConstants.kIntakeReadyRumble);
+            Superstructure.getInstance().getRumbleSubsystem().rumble(Constants.IntakeRollerConstants.kIntakeReadyRumble);
             firstTimeReady = false;
         }
         rollers.setVoltage(Constants.IntakeRollerConstants.kIntakePower);

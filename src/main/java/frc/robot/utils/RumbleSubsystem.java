@@ -12,21 +12,23 @@ public class RumbleSubsystem extends SubsystemBase {
 
     
 
-    private final CommandXboxController m_driverController;
-    private final CommandXboxController m_operatorController;
+    private CommandXboxController m_driverController;
+    private CommandXboxController m_operatorController;
 
     private double currentStrength;
     private double endTime;
     private Priority currentPriority;
 
 
-    public RumbleSubsystem(CommandXboxController m_driverController, CommandXboxController m_operatorController) {
-        this.m_driverController = m_driverController;
-        this.m_operatorController = m_operatorController;
-
+    public RumbleSubsystem() {
         this.currentStrength = 0;
         this.endTime = 0;
         this.currentPriority = Priority.NONE;
+    }
+
+    public void setControllers(CommandXboxController m_driverController, CommandXboxController m_operatorController) {
+        this.m_driverController = m_driverController;
+        this.m_operatorController = m_operatorController;
     }
 
     public void rumble(double strength, double seconds, Priority priority) {
@@ -45,6 +47,7 @@ public class RumbleSubsystem extends SubsystemBase {
     } 
 
     private void setRumble(double strength) {
+        if (m_driverController == null || m_operatorController == null) return;
         m_driverController.setRumble(GenericHID.RumbleType.kBothRumble, strength);
         m_operatorController.setRumble(GenericHID.RumbleType.kBothRumble, strength);
     }
