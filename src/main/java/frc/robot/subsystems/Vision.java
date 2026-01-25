@@ -1,12 +1,14 @@
 package frc.robot.subsystems;
 
 import frc.robot.Constants;
+import frc.robot.FieldConstants;
 import swervelib.SwerveDrive;
 import frc.robot.utils.LimelightHelpers;
 import frc.robot.utils.LimelightHelpers.PoseEstimate;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation2d;
 
 public class Vision {
     private static Vision _instance;    
@@ -51,7 +53,7 @@ public class Vision {
     public Pose2d getPosition() {return currentPosition;}
 
     public boolean isHubLocked() {
-        double angleToHub = Constants.FieldConstants.getHubPose().getTranslation()
+        double angleToHub = new Translation2d(FieldConstants.Hub.innerCenterPoint.getX(), FieldConstants.Hub.innerCenterPoint.getY())
                 .minus(currentPosition.getTranslation())
                 .getAngle().getDegrees();
         return angleToHub <= Constants.VisionConstants.kAimTolerance;

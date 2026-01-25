@@ -11,8 +11,8 @@ public class HoodSubsystem extends SubsystemBase {
     private Servo servoRight, servoLeft;
 
     public HoodSubsystem() {
-        servoRight = new Servo(Constants.HoodConstants.kServoIdYehodi);
-        servoLeft = new Servo(Constants.HoodConstants.kServoIdGoy);
+        servoRight = new Servo(Constants.HoodConstants.kServoRightID);
+        servoLeft = new Servo(Constants.HoodConstants.kServoLeftID);
 
         setAngle(Constants.HoodConstants.kStartingPos);
     }

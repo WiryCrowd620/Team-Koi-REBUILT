@@ -33,6 +33,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants;
+import frc.robot.FieldConstants;
 
 import java.io.File;
 import java.io.IOException;
@@ -105,9 +106,10 @@ public class SwerveSubsystem extends SubsystemBase {
         swerveDrive.setHeadingCorrection(false); // Heading correction should only be used while controlling the robot
                                                  // via
                                                  // angle.
-        swerveDrive.setCosineCompensator(!SwerveDriveTelemetry.isSimulation);// !SwerveDriveTelemetry.isSimulation); // Disables cosine compensation
-                                                // for
-                                                // simulations since it causes discrepancies not seen in real life.
+        swerveDrive.setCosineCompensator(!SwerveDriveTelemetry.isSimulation);// !SwerveDriveTelemetry.isSimulation); //
+                                                                             // Disables cosine compensation
+        // for
+        // simulations since it causes discrepancies not seen in real life.
         swerveDrive.setAngularVelocityCompensation(true,
                 true,
                 0.1); // Correct for skew that gets worse as angular velocity increases. Start with a
@@ -128,7 +130,7 @@ public class SwerveSubsystem extends SubsystemBase {
         RotationPID = new PIDController(Constants.SwerveDriveConstants.kPr, Constants.SwerveDriveConstants.kIr,
                 Constants.SwerveDriveConstants.kDr);
         RotationPID.enableContinuousInput(-Math.PI, Math.PI);
-        
+
     }
 
     /**
@@ -460,9 +462,18 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     public Command driveRelativeToHub(Supplier<ChassisSpeeds> velocity) {
+        Translation2d vHubDist = vision.getPosition().getTranslation().minus(new Translation2d(
+                FieldConstants.Hub.innerCenterPoint.getX(), FieldConstants.Hub.innerCenterPoint.getY()));
+        if (vHubDist.getNorm() > Constants.ShooterConstants.kMaxShootingDist) {
+            System.out.println("Robot is too far from the target");
+            return driveFieldOriented(velocity);
+        }
         state = SwerveState.VISION_AIMING;
         return run(() -> {
-            driveWhileAiming(velocity.get(), Constants.FieldConstants.getHubPose(), Constants.ShooterConstants.kMaxShootingDist);
+            driveWhileAiming(
+                    velocity.get(), new Pose2d(FieldConstants.Hub.innerCenterPoint.getX(),
+                            FieldConstants.Hub.innerCenterPoint.getY(), new Rotation2d()),
+                    Constants.ShooterConstants.kMaxShootingDist);
         }).finallyDo(() -> state = SwerveState.IDLE);
     }
 
@@ -528,25 +539,76 @@ public class SwerveSubsystem extends SubsystemBase {
      *
      * - `velocity` - controller input
      * - `target` - where the robot is looking to aim at
-    */
-    public void driveWhileAiming(ChassisSpeeds velocity, Pose2d target, double maxDist) {
-        Translation2d vHubDist = vision.getPosition().getTranslation().minus(Constants.FieldConstants.getHubPose().getTranslation());
-        if (vHubDist.getNorm() > maxDist) {
-            System.out.println("Robot is too far from the target");
-            return;
-        }
+     */
+    public void driveWhileAiming(ChassisSpeeds velocity, Pose2d target, double maxStrafe) {
         state = SwerveState.VISION_AIMING;
         Pose2d robotPose = getPose();
 
-        Rotation2d angleToTarget = target.getTranslation()
-                .minus(robotPose.getTranslation())
-                .getAngle();
+        // --- 1. Compute vector toward target ---
+        Translation2d toTarget = target.getTranslation().minus(robotPose.getTranslation());
+        double distance = toTarget.getNorm();
+        if (distance < 1e-6) {
+            // Already at target
+            swerveDrive.driveFieldOriented(new ChassisSpeeds(0, 0, 0));
+            return;
+        }
+        Translation2d toTargetDir = toTarget.div(distance); // normalized radial direction
 
-        double angularVelo = RotationPID.calculate(angleToTarget.getRadians(), getHeading().getRadians());
-        velocity.omegaRadiansPerSecond = angularVelo;
-        velocity.vxMetersPerSecond *= Constants.SwerveDriveConstants.kAimingSpeedModifier;
-        velocity.vyMetersPerSecond *= Constants.SwerveDriveConstants.kAimingSpeedModifier;
+        // --- 2. Project desired velocity onto radial and tangential ---
+        Translation2d desiredVel = new Translation2d(
+                velocity.vxMetersPerSecond,
+                velocity.vyMetersPerSecond);
+
+        double radialSpeed = desiredVel.dot(toTargetDir);
+        Translation2d tangential = desiredVel.minus(toTargetDir.times(radialSpeed));
+        double tangentialSpeed = tangential.getNorm();
+
+        // --- 3. Limit tangential (sideways) speed ---
+        if (tangentialSpeed > Constants.SwerveDriveConstants.kMaxStrafe) {
+            tangential = tangential.times(Constants.SwerveDriveConstants.kMaxStrafe / tangentialSpeed);
+        }
+
+        // --- 4. Recombine velocity and apply modifiers ---
+        Translation2d limitedVel = toTargetDir.times(radialSpeed).plus(tangential);
+        velocity.vxMetersPerSecond = limitedVel.getX() * Constants.SwerveDriveConstants.kAimingSpeedModifier;
+        velocity.vyMetersPerSecond = limitedVel.getY() * Constants.SwerveDriveConstants.kAimingSpeedModifier;
+
+        // --- 5. Apply angular PID toward target ---
+        Rotation2d angleToTarget = toTargetDir.getAngle();
+        velocity.omegaRadiansPerSecond = RotationPID.calculate(angleToTarget.getRadians(), getHeading().getRadians());
+
+        // --- 6. Drive the swerve ---
         swerveDrive.driveFieldOriented(velocity);
+    }
+
+    public record HubRelativeVelocity(
+            double radialSpeed,
+            double strafeSpeed) {
+    }
+
+    public HubRelativeVelocity getHubRelativeVelocity() {
+        Translation2d robotToHubRaw = FieldConstants.Hub.innerCenterPoint
+                .toTranslation2d()
+                .minus(swerveDrive.getPose().getTranslation());
+
+        double distance = robotToHubRaw.getNorm();
+        if (distance < 1e-6)
+            return new HubRelativeVelocity(0.0, 0.0);
+
+        Translation2d robotToHub = robotToHubRaw.div(distance);
+
+        ChassisSpeeds speeds = swerveDrive.getFieldVelocity();
+        Translation2d robotVel = new Translation2d(speeds.vxMetersPerSecond,
+                speeds.vyMetersPerSecond);
+
+        // Toward (+) / away (-) from hub
+        double radialSpeed = robotVel.dot(robotToHub);
+
+        // Sideways relative to hub
+        Translation2d tangentialVel = robotVel.minus(robotToHub.times(radialSpeed));
+        double strafeSpeed = tangentialVel.getNorm();
+
+        return new HubRelativeVelocity(radialSpeed, strafeSpeed);
     }
 
     // #endregion

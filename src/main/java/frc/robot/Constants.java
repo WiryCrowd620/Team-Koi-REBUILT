@@ -1,32 +1,12 @@
 package frc.robot;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import frc.robot.commands.ScoreCommand.ShooterPoint;
 import frc.robot.utils.RumbleSubsystem.Priority;
 import frc.robot.utils.RumblePack;
 
 public final class Constants {
   public static class OperatorConstants {
-
-    public final class ClimberConstants {
-      public static double kS = 0.0;
-      public static double kF = 0.0;
-      public static double kG = 0.0;
-      public static double kV = 0.0;
-      public static double kA = 0.0;
-      public static double kP = 0.0;
-      public static double kI = 0.0;
-      public static double kD = 0.0;
-      public static double tolerance = 0.0;
-
-      public static int MOTOR1_CAN_ID = 0;
-      public static int MOTOR2_CAN_ID = 0;
-
-      public static double METERS_PER_ROTATION = 0.0;
-
-    }
 
     public static final int kDriverControllerPort = 0;
     public static final int kOperatorControllerPort = 1;
@@ -40,18 +20,7 @@ public final class Constants {
     public static final int kEndGameTime = 30;
   }
 
-  public static class FieldConstants {
-    // We'll wait for 6238 positions for that
-    private static final Pose2d kBlueHub = new Pose2d();
-    private static final Pose2d kRedHub = new Pose2d();
-
-    public static Pose2d getHubPose() {
-      return DriverStation.getAlliance()
-          .orElse(Alliance.Blue) == Alliance.Red
-              ? kRedHub
-              : kBlueHub;
-    }
-  }
+  public static boolean disableHAL = false;
 
   public static class VisionConstants {
     public static final String kLimelightName = "limelight-front";
@@ -62,6 +31,7 @@ public final class Constants {
     public static final double kMaxSpeed = 5.36448;
     public static final double kMaxAngularVelocity = Math.PI;
     public static final double kAimingSpeedModifier = 0.5;
+    public static final double kMaxStrafe = 0.5; // max strafe speed while aiming
     public static final double kVisionPeriod = 0.1; // 10Hz
     public static final double kTargetErrorTolerance = Math.toRadians(3);
     public static final double kPr = 0.0, kIr = 0.0, kDr = 0.0;
@@ -93,14 +63,25 @@ public final class Constants {
         new ShooterPoint(4.0, 4250, 67)
     };
 
+    public static final InterpolatingDoubleTreeMap kRpmMap = new InterpolatingDoubleTreeMap();
+    public static final InterpolatingDoubleTreeMap kHoodMap = new InterpolatingDoubleTreeMap();
+
+    static {
+      for (ShooterPoint p : Constants.ShooterConstants.kShooterLUT) {
+        kRpmMap.put(p.distanceMeters(), p.rpm());
+        kHoodMap.put(p.distanceMeters(), p.hoodAngle());
+      }
+    }
+
     public static final double kMaxShootingDist = 4.0;
+    public static final double kRadialRPMComp = 150; // what rpm we need to compensate when driving backwards from the hub @ max accel
 
     public static final RumblePack kRumbleScoreReady = new RumblePack(0.3, 0.2, Priority.MEDIUM);
   }
 
   public static class HoodConstants {
-    public static final int kServoIdYehodi = 0;
-    public static final int kServoIdGoy = 0;
+    public static final int kServoRightID = 0;
+    public static final int kServoLeftID = 0;
     public static final double kMinDeg = 0;
     public static final double kMaxDeg = 0;
     public static final int kServoMin = 0;
