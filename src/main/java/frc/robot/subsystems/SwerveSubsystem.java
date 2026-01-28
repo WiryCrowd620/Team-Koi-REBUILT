@@ -511,6 +511,10 @@ public class SwerveSubsystem extends SubsystemBase {
         state = SwerveState.TELEOP;
         System.out.println(wantedState.name());
         if (wantedState == WantedState.PREPARING_SHOOTER || wantedState == WantedState.SHOOTING) {
+            if (!vision.isInAllianceZone()) {
+                swerveDrive.driveFieldOriented(velocity);
+                return;
+            }
             double dist = Vision.getInstance().getDistanceToHub().getNorm();
             if (dist > ShooterConstants.kMaxShootingDist) {
                 System.out.println("The robot is too far");
