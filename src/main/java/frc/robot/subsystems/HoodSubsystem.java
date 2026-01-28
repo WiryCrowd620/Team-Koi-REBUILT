@@ -30,7 +30,6 @@ public class HoodSubsystem extends SubsystemBase {
         state = HoodState.AT_TARGET;
     }
 
-    
     public void setAngle(double degrees) {
         degrees = MathUtil.clamp(degrees, Constants.HoodConstants.kMinDeg, Constants.HoodConstants.kMaxDeg);
 
@@ -43,8 +42,8 @@ public class HoodSubsystem extends SubsystemBase {
         double rightPwm = Constants.HoodConstants.kServoMin
                 + (1.0 - normalized) * (Constants.HoodConstants.kServoMax - Constants.HoodConstants.kServoMin);
 
-        servoRight.set(leftPwm);
-        servoLeft.set(rightPwm);
+        servoRight.set(rightPwm);
+        servoLeft.set(leftPwm);
 
         // Update target and state
         targetAngle = degrees;
@@ -68,6 +67,25 @@ public class HoodSubsystem extends SubsystemBase {
     /** Returns the current target angle */
     public double getTargetAngle() {
         return targetAngle;
+    }
+
+    private void resetPosition() {
+        setAngle(Constants.HoodConstants.kMinDeg);
+    }
+
+    private void handleWantedState() {
+        switch (currentWantedState) {
+            case IDLE:
+            case HOME:
+            case INTAKING:
+            case L1_CLIMB:
+            case L3_CLIMB:
+                resetPosition();
+                break;
+            case PREPARING_SHOOTER:
+            case SHOOTING:
+                
+        }
     }
 
     public boolean isReady() {
