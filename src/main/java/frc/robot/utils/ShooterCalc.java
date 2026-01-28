@@ -31,7 +31,6 @@ public class ShooterCalc {
         Pose2d robotPose = swerve.getPose();
         Translation2d hubPos = FieldConstants.Hub.innerCenterPoint.toTranslation2d();
 
-        // 1. Get Distance
         double distance = robotPose.getTranslation().getDistance(hubPos);
 
         // Guard Clause
@@ -41,17 +40,14 @@ public class ShooterCalc {
 
         double timeOfFlight = timeOfFlightMap.get(distance);
 
-        // 2. Get Raw Velocity
         ChassisSpeeds fieldSpeeds = swerve.getFieldVelocity();
 
-        // 3. FILTER THE VELOCITY (The Fix)
         // We smooth the X and Y components individually to remove sensor noise
         double smoothVx = xFilter.calculate(fieldSpeeds.vxMetersPerSecond);
         double smoothVy = yFilter.calculate(fieldSpeeds.vyMetersPerSecond);
 
         Translation2d smoothedVelocity = new Translation2d(smoothVx, smoothVy);
 
-        // 4. Calculate Lead with Smoothed Data
         // Virtual Target = Hub - (Velocity * Time)
         Translation2d leadOffset = smoothedVelocity.times(timeOfFlight);
         Translation2d virtualTarget = hubPos.minus(leadOffset);
