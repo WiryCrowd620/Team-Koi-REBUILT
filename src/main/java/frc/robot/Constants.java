@@ -1,6 +1,8 @@
 package frc.robot;
 
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
+import edu.wpi.first.wpilibj.LEDPattern;
+import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.utils.RumbleSubsystem.Priority;
 import frc.robot.utils.RumblePack;
 
@@ -180,5 +182,18 @@ public final class Constants {
 
     public static double kMetersPerRotation = 0.0;
 
+  }
+
+  public static class LEDconstants {
+    public static final int kLedPort = 2;
+    public static final int kLedCount = 120;
+
+    public static final double kBlinkTime = 0.5;
+
+    public static final LEDPattern kIdleLED = LEDPattern.solid(new Color("#800080"));
+    public static final LEDPattern kPrepLED = LEDPattern.solid(new Color("#FFEE8C"));
+    public static final LEDPattern kShootLED = LEDPattern.solid(new Color("rgba(13, 165, 165, 1)"));
+    public static final LEDPattern kIntakeLED = LEDPattern.solid(new Color("rgba(255, 65, 138, 1)"));
+    public static final LEDPattern kClimbsLED = LEDPattern.solid(new Color("rgba(45, 68, 243, 1)"));
   }
 }

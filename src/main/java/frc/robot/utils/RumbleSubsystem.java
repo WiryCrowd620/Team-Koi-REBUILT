@@ -10,8 +10,6 @@ public class RumbleSubsystem extends SubsystemBase {
         NONE, LOW, MEDIUM, HIGH
     }
 
-    
-
     private CommandXboxController m_driverController;
     private CommandXboxController m_operatorController;
 
